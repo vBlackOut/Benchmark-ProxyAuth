@@ -24,6 +24,7 @@
       const latency = data.map(d => d.latency_ms);
       const maxLatency = data.map(d => d.max_latency_ms);
       const cpu = data.map(d => d.cpu_percent);
+      const temp = data.map(d => d.cpu_temp);
 
       const ctx = document.getElementById('metricsChart').getContext('2d');
       new Chart(ctx, {
@@ -55,6 +56,12 @@
               borderWidth: 2,
               yAxisID: 'y2',
             },
+            {
+              label: 'Temp (°C)',
+              data: temp,
+              borderWidth: 2,
+              yAxisID: 'y3',
+            },
           ]
         },
         options: {
@@ -85,6 +92,14 @@
               title: { display: true, text: 'CPU (%)' },
               grid: { drawOnChartArea: false },
               ticks: { color: '#ff6384' }
+            },
+            y3: {
+              type: 'linear',
+              position: 'right',
+              offset: true,
+              title: { display: true, text: 'Temp (°C)' },
+              grid: { drawOnChartArea: false },
+              ticks: { color: '#36a2eb' }
             }
           }
         }
