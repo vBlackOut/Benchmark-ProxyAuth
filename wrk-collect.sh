@@ -8,7 +8,7 @@ PASSWORD="admin123"
 DURATION=300           # Total benchmark duration in seconds
 INTERVAL=10            # Interval between measurements
 CONNECTIONS=500
-THREADS=64
+THREADS=8 # change from your setup
 FINAL_JSON="chart_metrics.json"
 TIMEOUT=5              # Timeout for curl authentication in seconds
 
