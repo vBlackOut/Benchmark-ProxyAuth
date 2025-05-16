@@ -7,8 +7,8 @@ USERNAME="admin"
 PASSWORD="admin123"
 DURATION=300           # Total benchmark duration in seconds
 INTERVAL=10            # Interval between measurements
-CONNECTIONS=200
-THREADS=8
+CONNECTIONS=500
+THREADS=8 # Adjust here for your setup
 FINAL_JSON="chart_metrics.json"
 
 # === REQUIREMENTS CHECK ===
