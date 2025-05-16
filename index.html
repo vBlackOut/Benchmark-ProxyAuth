@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Benchmark Metrics</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { background: #121212; color: #fff; font-family: sans-serif; padding: 20px; }
+    canvas { max-width: 100%; background: #1e1e1e; border-radius: 8px; }
+    h1 { text-align: center; }
+  </style>
+</head>
+<body>
+  <h1>wrk Benchmark Metrics</h1>
+  <canvas id="metricsChart" height="120"></canvas>
+
+  <script>
+    async function drawChart() {
+      const response = await fetch('chart_metrics.json');
+      const data = await response.json();
+
+      const labels = data.map(d => new Date(d.timestamp * 1000).toLocaleTimeString());
+      const rps = data.map(d => d.rps);
+      const latency = data.map(d => d.latency_ms);
+      const maxLatency = data.map(d => d.max_latency_ms);
+      const cpu = data.map(d => d.cpu_percent);
+
+      const ctx = document.getElementById('metricsChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'RPS',
+              data: rps,
+              borderWidth: 2,
+              yAxisID: 'y',
+            },
+            {
+              label: 'Latency (ms)',
+              data: latency,
+              borderWidth: 2,
+              yAxisID: 'y1',
+            },
+            {
+              label: 'Max Latency (ms)',
+              data: maxLatency,
+              borderWidth: 2,
+              yAxisID: 'y1',
+            },
+            {
+              label: 'CPU (%)',
+              data: cpu,
+              borderWidth: 2,
+              yAxisID: 'y2',
+            },
+          ]
+        },
+        options: {
+          responsive: true,
+          interaction: {
+            mode: 'index',
+            intersect: false,
+          },
+          stacked: false,
+          scales: {
+            y: {
+              type: 'linear',
+              position: 'left',
+              title: { display: true, text: 'RPS' },
+              ticks: { color: '#4bc0c0' }
+            },
+            y1: {
+              type: 'linear',
+              position: 'right',
+              title: { display: true, text: 'Latency (ms)' },
+              grid: { drawOnChartArea: false },
+              ticks: { color: '#ffcd56' }
+            },
+            y2: {
+              type: 'linear',
+              position: 'right',
+              offset: true,
+              title: { display: true, text: 'CPU (%)' },
+              grid: { drawOnChartArea: false },
+              ticks: { color: '#ff6384' }
+            }
+          }
+        }
+      });
+    }
+
+    drawChart();
+  </script>
+</body>
+</html>
