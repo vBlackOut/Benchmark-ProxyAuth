@@ -8,8 +8,9 @@ PASSWORD="admin123"
 DURATION=300           # Total benchmark duration in seconds
 INTERVAL=10            # Interval between measurements
 CONNECTIONS=500
-THREADS=8 # Adjust here for your setup
+THREADS=64
 FINAL_JSON="chart_metrics.json"
+TIMEOUT=5              # Timeout for curl authentication in seconds
 
 # === REQUIREMENTS CHECK ===
 for cmd in curl jq wrk bc sensors; do
@@ -57,7 +58,7 @@ read prev_active prev_total < <(get_cpu_usage_snapshot)
 
 while [ $SECONDS -lt $DURATION ]; do
   echo "[+] Authenticating..."
-  RESPONSE=$(curl -k -s -X POST "$AUTH_URL" \
+  RESPONSE=$(curl -k -s --max-time "$TIMEOUT" -X POST "$AUTH_URL" \
     -H "Content-Type: application/json" \
     -d "{\"username\": \"$USERNAME\", \"password\": \"$PASSWORD\"}")
   TOKEN=$(echo "$RESPONSE" | jq -r .token)
@@ -94,16 +95,13 @@ while [ $SECONDS -lt $DURATION ]; do
   prev_active=$cur_active
   prev_total=$cur_total
 
-# === GET CPU TEMPERATURE (CPUTIN) ===
-TEMP=$(sensors | grep -m1 'CPUTIN' | grep -oE '\+[0-9]+\.[0-9]+' | head -n1 | tr -d '+')
-
-if [[ -z "$TEMP" ]]; then
+  # === GET CPU TEMPERATURE (CPUTIN fallback CPU) ===
+  TEMP=$(sensors | grep -m1 'CPUTIN' | grep -oE '\+[0-9]+\.[0-9]+' | head -n1 | tr -d '+')
+  if [[ -z "$TEMP" ]]; then
     TEMP=$(sensors | grep -m1 'CPU' | grep -oE '\+[0-9]+\.[0-9]+' | head -n1 | tr -d '+')
-fi
-
-# Fallback and format
-[[ -z "$TEMP" ]] && TEMP="0.0"
-[[ "$TEMP" =~ ^\.[0-9]+$ ]] && TEMP="0$TEMP"
+  fi
+  [[ -z "$TEMP" ]] && TEMP="0.0"
+  [[ "$TEMP" =~ ^\.[0-9]+$ ]] && TEMP="0$TEMP"
 
   # === BUILD METRIC JSON ===
   METRIC=$(jq -n \
