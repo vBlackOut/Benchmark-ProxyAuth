@@ -97,6 +97,10 @@ while [ $SECONDS -lt $DURATION ]; do
 # === GET CPU TEMPERATURE (CPUTIN) ===
 TEMP=$(sensors | grep -m1 'CPUTIN' | grep -oE '\+[0-9]+\.[0-9]+' | head -n1 | tr -d '+')
 
+if [[ -z "$TEMP" ]]; then
+    TEMP=$(sensors | grep -m1 'CPU' | grep -oE '\+[0-9]+\.[0-9]+' | head -n1 | tr -d '+')
+fi
+
 # Fallback and format
 [[ -z "$TEMP" ]] && TEMP="0.0"
 [[ "$TEMP" =~ ^\.[0-9]+$ ]] && TEMP="0$TEMP"
