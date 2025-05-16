@@ -104,4 +104,4 @@ done
 # Close the JSON array
 echo "]" >> "$FINAL_JSON"
 
-echo "[✅] JSON metrics exported to $FINAL_JSON"
+echo "[x] JSON metrics exported to $FINAL_JSON"
